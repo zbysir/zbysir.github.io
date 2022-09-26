@@ -3,7 +3,6 @@ title: 如何使用 Go 渲染 Jsx
 slug: gojsx
 date: 2022-07-31
 tags: [Golang, Goja, Esbuild, Jsx]
-img: "https://marketplace.canva.cn/2SWjI/MAEuBy2SWjI/1/tl/canva-MAEuBy2SWjI.jpg"
 desc: 让 Golang 也能使用 Jsx 这样好用的模板语法。
 ---
 
