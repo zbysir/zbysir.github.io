@@ -17,6 +17,7 @@ tags: [Vue, Golang]
 SSR有一个优点就是首屏直出，是不是就能解决首屏慢的问题了呢？并不能。在vue-ssr渲染过程中，服务端渲染只是其中一半，当首屏数据到达浏览器之后，为了能够实现vue的响应式数据，则还需要一步操作：[客户端激活](https://ssr.vuejs.org/zh/guide/hydration.html)，这一步的性能将影响什么呢？
 
 如果客户端激活速度过慢会发生以下问题：
+
 - 用户将先看到页面内容，但是会卡一小会没响应（如没办法滑动），这是因为客户端激活是一个很耗cpu的操作。
 - 业务js执行变慢，如懒加载、动效代码都会在客户端激活完成之后才会执行，这会导致用户首先看不到图片或者动效，给用户卡顿的感觉，在cpu更慢的手机端尤为明显。
 
@@ -26,6 +27,7 @@ SSR有一个优点就是首屏直出，是不是就能解决首屏慢的问题�
 
 #### 可扩展性低
 大量的代码被封装到了nuxt里, 过多的配置项被放在了nuxt.config.js中, 不够灵活就导致了很多特性没办法实现:
+ 
 - 如要修改head必须修改meta, 但vue-meta配置是有限的, 比如不支持meta标签闭合(可恶的搜狗站长认证需要闭合的meta标签).
 - 如publicPath无法动态修改.
 
@@ -42,6 +44,7 @@ SSR有一个优点就是首屏直出，是不是就能解决首屏慢的问题�
 
 #### 难点
 使用Go来渲染Vue模板并不容易实现，随便一想便知道其中的难点：
+
 - 解析vue各种语法（如slot、v-if、v-for）并一一实现，这可能不复杂，但工作量很大。
 - 解析js表达式，在模板中会大量使用到js表达式，`如v-if = "a != 0"`，现在需要使用Go去计算这些表达式，虽然知道有AST（[抽象语法树](https://baike.baidu.com/item/%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95%E6%A0%91/6129952?fr=aladdin)） 这是可行的，但工作量也很大。
 - 生成Go代码，为了减少运行时损耗，和webpack打包原理一样，我们需要提前对代码进行处理，也就是生成中间代码。和vue-loader类似，在这个项目中，需要我们从Vue模板生成render函数，不同的是我们的render函数是Golang语言的。
@@ -134,6 +137,7 @@ htmlStr := r.Component_info(&Options{
 
 ## 结果
 项目已经开源，希望能让喜爱Vue和Go的伙伴们多一个可尝试的东西，同时也感谢你的ISSUE。
+
 - [https://github.com/zbysir/go-vue-ssr](https://github.com/bysir-zl/go-vue-ssr) :预编译成go语言运行。
 - [https://github.com/zbysir/vpl](https://github.com/bysir-zl/vpl) :直接运行模板，更方便。
 

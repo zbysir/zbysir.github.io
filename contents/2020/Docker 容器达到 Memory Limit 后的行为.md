@@ -1,5 +1,6 @@
 ---
 title: "Docker 容器达到 Memory Limit 后的行为"
+slug: docker-memory-limit
 date: 2020-03-22
 tags: [Docker]
 desc: 坑太多了

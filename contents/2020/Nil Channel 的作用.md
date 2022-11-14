@@ -1,5 +1,6 @@
 ---
 title: "Nil Channel 的作用"
+slug: golang-nil-channel
 date: 2020-02-12
 tags: [Golang]
 desc: 思考来源于一次忘记初始化channel，造成程序卡死。
