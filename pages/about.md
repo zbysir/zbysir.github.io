@@ -12,7 +12,7 @@
 
 做过有趣的事情是将 Golang 与 Vue、React 结合，比如 [这个项目](https://github.com/zbysir/gojsx)，和 [这个](https://github.com/zbysir/go-vue-ssr)。
 
-还想让编程与“艺术”结合，如音乐、画画、游戏，我也想搞搞艺术。
+还想让编程与“艺术”结合，如音乐、画画、游戏，我也想更加浪漫。
 
 这还有一些项目是我做的 😉：
 
