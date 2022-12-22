@@ -1,6 +1,7 @@
 ---
+title: 在 Golang 中尝试干净架构
 date: 2021-08-01
-slug: 'Clean Architecture on Golang'
+slug: 'CleanArchitectureOnGolang'
 tags: [Golang]
 desc: 架构是一个哲学问题
 ---
