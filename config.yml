@@ -49,7 +49,7 @@ theme_config:
 
   stack: Tailwindcss + <a href="https://github.com/zbysir/hollow">Hollow</a> + <a href="https://github.com/zbysir/gojsx">Jsx</a>
   footer_links:
-    - url: https://github.com/zbysir
+    - link: https://github.com/zbysir
       name: GitHub
       icon: GitHub
   links_page: 'pages/links.md'
