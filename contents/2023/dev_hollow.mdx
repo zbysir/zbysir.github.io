@@ -1,0 +1,27 @@
+---
+title: 开发 Hollow 遇到的技术总结
+slug: dev-hollow
+date: 2023-01-01
+tags: [Golang, Jsx, Mdx]
+draft: true
+desc: 能学到好玩的东西
+---
+
+- 文件系统
+  - [go-billy](https://github.com/go-git/go-billy)
+- 渲染 Jsx
+  - [goja](https://github.com/dop251/goja)(只支持 es5) 与 [esbuild](https://github.com/evanw/esbuild)(编译成低版本) 结合
+- 预览
+  - go 静态文件服务添加 ETAG
+- 渲染 Markdown/Mdx
+  - [goldmark](https://github.com/yuin/goldmark) (最强大的 markdown 解析器，没有之一)
+  - 为 [goldmark](https://github.com/yuin/goldmark) 编写插件
+  - 将 html 节点转为 jsx 节点。
+- 加载远端文件（主题）
+  - [gogit](https://github.com/go-git/go-git)
+- 开发工程
+  - 使用 esbuild 打包
+    - [esbuild-style-plugin](https://www.npmjs.com/package/esbuild-style-plugin) 插件
+  - tailwind
+  - 监听文件变化的问题: esbuild 能监听到 entryPoints 的变化，但监听不到 tailwind content 的变化，这导致 mdx 中使用的 tailwind 单元无法被打包。esbuild-style-plugin 插件 解决了这个问题。
+  @deanc/esbuild-plugin-postcss 就有这个问题。
