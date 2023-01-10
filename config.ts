@@ -1,6 +1,6 @@
 export const hollow = {
-    // theme: 'https://github.com/zbysir/hollow-theme/tree/master/hollow',
-    theme: 'file://Users/bysir/front/bysir/hollow-theme/hollow',
+    theme: 'https://github.com/zbysir/hollow-theme/tree/master/hollow',
+    // theme: 'file://Users/bysir/front/bysir/hollow-theme/hollow',
     assets: ['statics']
 }
 
