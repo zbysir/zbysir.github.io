@@ -6,34 +6,34 @@ tags: [Vue, Golang]
 ---
 
 ## Why not [Nuxt](https://nuxtjs.org/guide)
-大佬们进来一定会有一个疑问：为什么已经有vue-ssr了（如nuxt框架）还需要用go来渲染？vue-ssr提供的前后端同构、单页应用加上vue的数据绑定功能，能少写很多代码，它不香吗？
+大佬们进来一定会有一个疑问：为什么已经有 vue-ssr 了（如 nuxt 框架）还需要用 go 来渲染？vue-ssr 提供的前后端同构、单页应用加上 vue 的数据绑定功能，能少写很多代码，它不香吗？
 
-笔者的回答是香，也不香，确实Vue用它简单易上手的特性得到了很多人喜爱，也包括我，所以当我需要服务端渲染的时候，也自然的使用了vue-ssr，选用的[nuxtjs.org](https://nuxtjs.org/guide/)框架，但事物总有好有坏，很快我就发现了它的问题。
+笔者的回答是香，也不香，确实 Vue 用它简单易上手的特性得到了很多人喜爱，也包括我，所以当我需要服务端渲染的时候，也自然的使用了 vue-ssr ，选用的 [nuxtjs.org](https://nuxtjs.org/guide/)框架，但事物总有好有坏，很快我就发现了它的问题。
 
 #### 性能低
 
 如果项目是一个后台管理系统，那么首屏渲染速度和运行时的性能可能不怎么重要，但如果是一个面向C端的网站，响应速度却十分总要，因为这直接影响到用户体验。
 
-SSR有一个优点就是首屏直出，是不是就能解决首屏慢的问题了呢？并不能。在vue-ssr渲染过程中，服务端渲染只是其中一半，当首屏数据到达浏览器之后，为了能够实现vue的响应式数据，则还需要一步操作：[客户端激活](https://ssr.vuejs.org/zh/guide/hydration.html)，这一步的性能将影响什么呢？
+SSR有一个优点就是首屏直出，是不是就能解决首屏慢的问题了呢？并不能。在 vue-ssr 渲染过程中，服务端渲染只是其中一半，当首屏数据到达浏览器之后，为了能够实现vue的响应式数据，则还需要一步操作：[客户端激活](https://ssr.vuejs.org/zh/guide/hydration.html)，这一步的性能将影响什么呢？
 
 如果客户端激活速度过慢会发生以下问题：
 
-- 用户将先看到页面内容，但是会卡一小会没响应（如没办法滑动），这是因为客户端激活是一个很耗cpu的操作。
-- 业务js执行变慢，如懒加载、动效代码都会在客户端激活完成之后才会执行，这会导致用户首先看不到图片或者动效，给用户卡顿的感觉，在cpu更慢的手机端尤为明显。
+- 用户将先看到页面内容，但是会卡一小会没响应（如没办法滑动），这是因为客户端激活是一个很耗 cpu 的操作。
+- 业务 js 执行变慢，如懒加载、动效代码都会在客户端激活完成之后才会执行，这会导致用户首先看不到图片或者动效，给用户卡顿的感觉，在 cpu 性能有限的手机端尤为明显。
 
 客户端激活的性能也是有办法调优的，比如这篇文章提到的懒激活[vue-lazy-hydration](https://github.com/maoberlehner/vue-lazy-hydration)：[How to Drastically Reduce Estimated Input Latency and Time to Interactive of SSR Vue.js Applications](https://markus.oberlehner.net/blog/how-to-drastically-reduce-estimated-input-latency-and-time-to-interactive-of-ssr-vue-applications/)，不过也许客户端激活的性能还不是重点，因为接下来还有Node端渲染的性能问题。
 
 在我参与的项目中，由于页面功能复杂，一个页面需要500ms左右的渲染时间，也由于有动态路由参数的功能存在，没办法像静态页面一样加上缓存，就导致了在并发稍微高一点之后，响应速度越来越慢。
 
 #### 可扩展性低
-大量的代码被封装到了nuxt里, 过多的配置项被放在了nuxt.config.js中, 不够灵活就导致了很多特性没办法实现:
+大量的代码被封装到了 nuxt 里, 过多的配置项被放在了 nuxt.config.js 中, 不够灵活就导致了很多特性没办法实现:
  
-- 如要修改head必须修改meta, 但vue-meta配置是有限的, 比如不支持meta标签闭合(可恶的搜狗站长认证需要闭合的meta标签).
-- 如publicPath无法动态修改.
+- 如要修改 head 必须修改 meta, 但 vue-meta 配置是有限的, 比如不支持meta标签闭合(可恶的搜狗站长认证需要闭合的meta标签).
+- 如 publicPath 无法动态修改.
 
-当你想做一个更复杂的网站时, nuxt虽然开箱即用但却又像一个盒子一样让你四处碰壁.
+当你想做一个更复杂的网站时, nuxt 虽然开箱即用但却又像一个盒子一样让你四处碰壁.
 
-所以我决定放弃庞大笨重(对于我们的项目来说)的nuxt, 回归字符串渲染.
+所以我决定放弃庞大笨重(对于我们的项目来说)的 nuxt, 回归字符串渲染.
 
 ## 思考
 也许在面临更为致命的性能问题时，什么响应式、数据绑定功能也不再重要，我们开始考虑传统模板引擎。
@@ -45,8 +45,8 @@ SSR有一个优点就是首屏直出，是不是就能解决首屏慢的问题�
 #### 难点
 使用 Go 来渲染 Vue 模板并不容易实现，随便一想便知道其中的难点：
 
-- 解析 vue 各种语法（如slot、v-if、v-for）并一一实现，这可能不复杂，但工作量很大。
-- 解析 js 表达式，在模板中会大量使用到js表达式，`如v-if = "a != 0"`，现在需要使用Go去计算这些表达式，虽然知道有AST（[抽象语法树](https://baike.baidu.com/item/%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95%E6%A0%91/6129952?fr=aladdin)） 这是可行的，但工作量也很大。
+- 解析 vue 各种语法（如 slot、v-if、v-for ）并一一实现，这可能不复杂，但工作量很大。
+- 解析 js 表达式，在模板中会大量使用到js表达式，`如v-if = "a != 0"`，现在需要使用 Go 去计算这些表达式，虽然知道有 AST（[抽象语法树](https://baike.baidu.com/item/%E6%8A%BD%E8%B1%A1%E8%AF%AD%E6%B3%95%E6%A0%91/6129952?fr=aladdin)） 这是可行的，但工作量也很大。
 - 生成 Go 代码，为了减少运行时损耗，和 webpack 打包原理一样，我们需要提前对代码进行处理，也就是生成中间代码。和 vue-loader 类似，在这个项目中，需要我们从 Vue 模板生成 render 函数，不同的是我们的 render 函数是 Golang 语言的。
 
 不过既然都是可行的，不妨试试。
@@ -63,17 +63,17 @@ SSR有一个优点就是首屏直出，是不是就能解决首屏慢的问题�
 我们将这个组件命名为消息提示组件，它可能是这个样子
 ![element-ui alert](https://upload-images.jianshu.io/upload_images/3447621-a6dcbccd060be362.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-#### 1. 解析html成节点树
-解析html比我想象中复杂，这是因为有自闭合和不闭合的标签，如`<meta charset="UTF-8">`，如果使用xml的处理逻辑的话需要做很多额外判断，为了不重复造轮子，最终选用`golang.org/x/net/html`包来解析html，不过值得注意的是正规的html格式有一些要求：如 select 里只能包含 option 子节点，但 Vue 模板由于有自定义组件和 slot 语法等，可能不满足 html 的要求，这会让 html 包无法正确解析出节点，由于没有更好的解析包作为代替，无奈只好魔改一点 html 包了。
+#### 1. 解析 html 成节点树
+解析 html 比我想象中复杂，这是因为有自闭合和不闭合的标签，如`<meta charset="UTF-8">`，如果使用xml的处理逻辑的话需要做很多额外判断，为了不重复造轮子，最终选用`golang.org/x/net/html`包来解析html，不过值得注意的是正规的 html 格式有一些要求：如 select 里只能包含 option 子节点，但 Vue 模板由于有自定义组件和 slot 语法等，可能不满足 html 的要求，这会让 html 包无法正确解析出节点，由于没有更好的解析包作为代替，无奈只好魔改一点 html 包了。
 
-#### 2. 解析vue模板语法
+#### 2. 解析 vue 模板语法
 这一步十分简单，我们只需要递归遍历 html 节点数中的节点，根据节点的 attr，再生成一个 vue 节点结构体，其中包含如 porps，v-if 等信息。这一步是为了方便的从节点树生成 Golang 代码。
 
-#### 3. 生成Go代码
+#### 3. 生成 Go 代码
 
 ##### 递归节点
 我们需要根据节点生成 Go 代码，特别要处理的是 vue 的各个指令，如 v-if 需要生成如下的 Go 代码
-```
+```go
 var s = ""
 if xxx {
   s = "<div></div>"
@@ -83,7 +83,7 @@ if xxx {
 retun s
 ```
 v-for 如下
-```
+```go
 var s = ""
 
 for i, v := range arr{
@@ -94,12 +94,12 @@ return s
 这里不难，唯一难点是 v-if / v-else / v-else-if 的关联关系，我也是参考 vue 官方的模板处理方法才实现的。
 
 ##### 解析 Js AST
-在 v-if 或者 {{}} 中需要使用一些js表达式，如 v-if="a!=b && a!=c"，幸运的是 Golang 有一个库可以解析JS AST: [https://github.com/robertkrimen/otto](https://github.com/robertkrimen/otto), 唯一不足就是只支持ES5, 不过ES5在模板中足够了.
+在 `v-if` 或者 `{{}}` 中需要使用一些 js 表达式，如 `v-if="a!=b && a!=c"`，幸运的是 Golang 有一个库可以解析 JS AST: [https://github.com/robertkrimen/otto](https://github.com/robertkrimen/otto), 唯一不足就是只支持ES5, 不过ES5在模板中足够了.
 
 得到 Js AST 之后就需要将 AST 翻译成 Golang，难度不大，多写几个 switch case 就好。代码[在此](https://github.com/zbysir/go-vue-ssr/blob/master/pkg/vuessr/ast/go.go#L10)
 
 最终生成的 Go 代码会像这样：
-```
+```go
 // Code generated by go-vue-ssr: https://github.com/zbysir/go-vue-ssr
 // src_hash:535087cd1e2031e7772d0d62e5390830
 
@@ -119,7 +119,7 @@ func (r *Render) Component_info(options *Options) string {
 }
 ```
 现在只需要调用则可以返回 html 字符串
-```
+```go
 r := NewRender()
 htmlStr := r.Component_info(&Options{
         Props: map[string]interface{}{
@@ -138,8 +138,8 @@ htmlStr := r.Component_info(&Options{
 ## 结果
 项目已经开源，希望能让喜爱 Vue 和 Go 的伙伴们多一个可尝试的东西，同时也感谢你的 ISSUE。
 
-- [https://github.com/zbysir/go-vue-ssr](https://github.com/bysir-zl/go-vue-ssr): 基于代码生成的模板引擎。
-- [https://github.com/zbysir/vpl](https://github.com/bysir-zl/vpl): 直接运行 vue 模板，更方便。
-- [https://github.com/zbysir/gojsx](https://github.com/bysir-zl/gojsx): 再进一步，使用 golang 渲染 jsx、mdx。
+- [https://github.com/zbysir/go-vue-ssr](https://github.com/zbysir/go-vue-ssr): 基于代码生成的模板引擎。
+- [https://github.com/zbysir/vpl](https://github.com/zbysir/vpl): 直接运行 vue 模板，更方便。
+- [https://github.com/zbysir/gojsx](https://github.com/zbysir/gojsx): 再进一步，使用 golang 渲染 jsx、mdx。
 
 目前已经运行在公司项目中，你可以访问 [http://zhuzi.com.cn](http://zhuzi.com.cn/) 查看渲染效果。
