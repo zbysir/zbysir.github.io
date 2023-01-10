@@ -18,7 +18,7 @@ export const theme = {
             family: 'Arial,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","WenQuanYi Micro Hei",sans-serif'
         }
     ],
-    stack: 'Tailwindcss + <a href="https://github.com/zbysir/hollow">Hollow</a> + <a href="https://github.com/zbysir/gojsx">Jsx</a>',
+    stack: '<a href="https://github.com/zbysir/hollow">Hollow</a> + <a href="https://github.com/zbysir/gojsx">Jsx / Mdx</a>',
     footer_links: [
         {
             link: 'https://github.com/zbysir',
