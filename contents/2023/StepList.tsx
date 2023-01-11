@@ -15,8 +15,8 @@ export default ({items}: Props) => {
             content: i.content
         })).map((i,index) =>
             <>
-                <div className={"shrink-0 flex px-3 py-2 border border-gray-300 dark:border-gray-900 bg-white dark:bg-gray-900 rounded-md content-center items-center"}>
-                    <div className={"text-center text-gray-500"}>
+                <div className={"shrink-0 flex px-3 py-2 border border-neutral-300 dark:border-neutral-900 bg-white dark:bg-neutral-900 rounded-md content-center items-center"}>
+                    <div className={"text-center text-neutral-500"}>
                         <div className={""}>{i.year}</div>
                         <div className={"text-xs"}>{i.monthday}</div>
                     </div>

@@ -12,7 +12,22 @@ esbuild
     bundle: true,
     plugins: [
       stylePlugin({
-        postcss: {plugins: [tailwindcss, autoprefixer]},
+        postcss: {
+          plugins: [tailwindcss({
+            mode: 'jit',
+            content: [
+              './**/*.{jsx,tsx,html,mdx}',
+            ],
+            // darkMode: "class",
+            plugins: [
+              require('@tailwindcss/typography')({
+                // :where 在手机上兼容性不佳，不启用
+                // https://github.com/tailwindlabs/tailwindcss-typography/pull/203
+                target: 'legacy'
+              }),
+            ],
+          }), autoprefixer]
+        },
       })
     ],
     external: ['@bysir/hollow'],

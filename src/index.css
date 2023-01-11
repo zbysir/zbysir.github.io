@@ -1,2 +1,25 @@
 /* 主题已经包含了 base，项目只需要使用 utilities*/
 @tailwind utilities;
+
+time{
+    display: block;
+    position: relative;
+}
+
+time:before{
+    content: attr(data-date);
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translate(calc( -100% - 20px), -50%);
+}
+
+time:after{
+    content: "";
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left:-10px;
+    width: 1px;
+    background-color: #628bf8;
+}
