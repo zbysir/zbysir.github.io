@@ -6,7 +6,7 @@ anchor:
       - [在 Golang 中尝试干净架构](/blogs/CleanArchitectureOnGolang)
   悬疑电影:
     content_md: |
-      启蒙是 「恐怖游轮」，最近在看「边缘世界」
+      启蒙是 「恐怖游轮」，最近看过「边缘世界」
 ---
 
 ## 关于博客
