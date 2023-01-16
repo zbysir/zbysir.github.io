@@ -3,29 +3,62 @@ title: 开发 Hollow 技术总结
 slug: dev-hollow
 date: 2023-01-01
 tags: [Golang, Jsx, Mdx]
-draft: true
+draft: false
 desc: 能学到好玩的东西
 ---
 
-本以为一个简单的博客系统没难度，但随着开发过程，我发现它越来越有有趣，也越来越有差异化。
+本以为一个简单的博客系统没难度，但随着开发过程，我发现它越来越有有趣，也越来越差异化。
 
-- 文件系统
-  - [go-billy](https://github.com/go-git/go-billy)
-- 渲染 Jsx
-  - [goja](https://github.com/dop251/goja)(只支持 es5) 与 [esbuild](https://github.com/evanw/esbuild)(编译成低版本) 结合
-- 预览
-  - go 静态文件服务添加 ETAG
-- 渲染 Markdown/Mdx
-  - [goldmark](https://github.com/yuin/goldmark) (最强大的 markdown 解析器，没有之一)
-  - 为 [goldmark](https://github.com/yuin/goldmark) 编写插件解析 js 代码与 jsx 代码
-  - 将 html 转为 jsx。
-  - sourcemap
-    - https://juejin.cn/post/6844903887556575246
-- 加载远端文件（主题）
-  - [gogit](https://github.com/go-git/go-git)
-- 开发工程
-  - 使用 esbuild 打包
-    - [esbuild-style-plugin](https://www.npmjs.com/package/esbuild-style-plugin) 插件
-  - tailwind
-  - 监听文件变化的问题: esbuild 能监听到 entryPoints 的变化，但监听不到 tailwind content 的变化，这导致 mdx 中使用的 tailwind 单元无法被打包。esbuild-style-plugin 插件 解决了这个问题。
-  @deanc/esbuild-plugin-postcss 就有这个问题。
+## 文件系统
+文件系统（FileSystem）在 Golang 中有个实现即 fs 包。但它太简陋了，只能读，不能写。
+
+在 Hollow 中，FS 用来实现适配多个数据来源，如 DB、本地、远端文件，需要实现可读可写。
+
+Github 上可搜到的库不多，star 更不多，最后在研究 git 时，发现了 [go-billy](https://github.com/go-git/go-billy)，至少被使用在了 go-git 这个有名的库上（也诞生于 go-git）。
+
+go-billy 自己的介绍如下：
+> The missing interface filesystem abstraction for Go. Billy implements an interface based on the os standard library, allowing to develop applications without dependency on the underlying storage. Makes it virtually free to implement mocks and testing over filesystem operations.
+
+它有两个文件系统实现，其一是标准文件系统，其二是内存文件系统，标准文件系统是基础，值得说的是内存文件系统实现，它可以做文件缓存与 Mock，Hollow 用来做主题文件缓存。
+
+## 渲染 Jsx
+渲染 Jsx 的功能独立成为了一个库：[gojsx](https://github.com/zbysir/gojsx)，更多信息可以了解这个库，这里简单说下：
+
+[goja](https://github.com/dop251/goja) 是一个纯 Golang 实现的 JavaScript 解析器，支持所有 es5 特性，但不支持 es6，当然也不支持 Jsx 等高级语法，
+不过同时 Golang 中还有一个有名的处理 Js 的库：[esbuild](https://github.com/evanw/esbuild)，它提供了 API 支持将 Jsx/Tsx 等高级语法转换成 es5 兼容的语法。
+
+goja 中暴露了一个接口，支持我们自己提供文件内容，我们只需要在中间使用 esbuild 将内容处理成 es5 语法再交给 goja 运行即可。
+
+jsx 转换之后 render 函数运行之后会得到一个类 dom 树，渲染它就相对简单更多了。
+
+## 预览服务
+Hollow 也提供预览功能，启动一个 http 服务，对内容的更改可以实时（刷新后）反应到浏览器中。
+
+对于任何静态文件的更改也应该是实时的，但现实是 Golang 实现的 http.FileServer 默认实现的是 200 强制缓存，并不支持更改（感觉代码有点残缺），所以需要自己魔改来支持 304 协程缓存。
+
+## 渲染 Markdown/Mdx
+一开始渲染 Mdx 是 Hollow 自己实现的，但后面觉得存在于 [gojsx](https://github.com/zbysir/gojsx) 更合理，于是搬到了 [gojsx](https://github.com/zbysir/gojsx) 中。
+
+大体步骤如下：
+
+1. 选择一个易扩展的 Markdown 解析器，在 Golang 中只有一个选择：[goldmark](https://github.com/yuin/goldmark)。
+2. 为 [goldmark](https://github.com/yuin/goldmark) 编写插件解析 js 代码与 jsx 代码，确保 jsx 代码不会被当前其他块被错误处理。
+3. 将 html 转为 jsx，这也是也是一个脏活。
+4. 交由 gojsx 运行。
+
+这里还研究聊下 sourcemap，想实现 md 文件到 jsx 文件的映射，但 goldmark 的渲染器不太好添加这个特性，要实现几乎等于重写 goldmark 的 html 渲染器，收益不大。
+
+## 加载远端文件（主题）
+Hollow 可以指定一个远程的 git 仓库地址作为主题，这得益于 [go-git](https://github.com/go-git/go-git) 库，go-git 底层使用的文件系统就是 [go-billy](https://github.com/go-git/go-billy)，这也是我选中 go-billy 作为 Hollow 的文件系统的原因。
+
+## 开发工程
+想体验 esbuild 的打包的速度，所以无论开发还是生产环境都使用了 esbuild 打包，结果是性能稳定，兼容性也没问题。
+
+由于需要使用到 tailwind css，我们还需要使用 esbuild-style 插件：[esbuild-style-plugin](https://www.npmjs.com/package/esbuild-style-plugin)
+
+我之前选择的是 @deanc/esbuild-plugin-postcss 插件，不过我发现使用它时，esbuild 监听不到 tailwind content 的变化，这导致 mdx 中使用的 tailwind 单元更改时无法实时构建。esbuild-style-plugin 插件解决了这个问题。
+   就有这个问题。
+
+> 你所做的事情，或许无人在意，但只要你仍追求完美，你就终将掌握连专家也望而兴叹的技能
+>
+> -- 史蒂夫·沃兹尼亚克，苹果公司联合创始人
