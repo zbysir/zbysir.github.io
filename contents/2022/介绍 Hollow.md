@@ -6,9 +6,7 @@ tags: [Golang, Jsx, Blog]
 desc: 没有限制、规则，代码即所得。
 ---
 
-https://github.com/zbysir/hollow
-
-Hollow 是一个快速、简洁静态博客生成器。目前只服务于自己，还未准备好给大家使用，文档也待完成。
+https://github.com/zbysir/hollow, Hollow 是一个快速、简洁静态博客生成器。目前只服务于自己，还未准备好给大家使用，文档也待完成。
 
 相关文章：
 - [开发 Hollow 技术总结](/blogs/dev-hollow)

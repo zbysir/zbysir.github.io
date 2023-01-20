@@ -33,7 +33,8 @@ go-billy 自己的介绍如下：
 goja 中暴露了一个接口，支持我们自己提供文件内容，我们只需要在中间使用 esbuild 将内容处理成 es5 语法再交给 goja 运行即可。
 
 运行 jsx 的 render 函数需要手动实现 [jsx-runtime](https://zh-hans.reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html)，得益于 jsx 的合理设计，我们只需要实现一个 runtime 渲染出类 Dom 树：
-```
+
+```javascript
 export function jsx(nodeName, attributes) {
   if (typeof nodeName === 'string') {
     return {
