@@ -7,11 +7,11 @@ desc: "也许你会疑惑: 添加了hash后的文件名每次打包都会变动,
 ---
 
 ## 需求
-如果你使用 Vue/React脚手架搭建的项目, 你可能永远不需要这个步骤.
+如果你使用 Vue/React 脚手架搭建的项目, 你可能永远不需要这个步骤.
 
-不过如果你需要手写webpack配置, 或者对webpack感兴趣, 也许你会疑惑: 添加了hash后的文件名每次打包都会变动, 如何将最新文件名写入到页面上?
+不过如果你需要手写 webpack 配置, 或者对 webpack 感兴趣, 也许你会疑惑: 添加了 hash 后的文件名每次打包都会变动, 如何将最新文件名写入到页面上?
 
-答案是通过[html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin)插件将打包之后的文件名Inject到index.html中.
+答案是通过 [html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin) 插件将打包之后的文件名 Inject 到 index.html 中.
 
 此逻辑仅仅需要配置几行代码
 ```
@@ -24,9 +24,9 @@ new HtmlWebpackPlugin({
 
 很简单, 所以我们一般不用花时间研究它.
 
-不过我在一个项目中, index.html不再由前端定义, 而是由服务端渲染输出, 所以HtmlWebpackPlugin这套逻辑不再走得通.
+不过我在一个项目中, index.html 不再由前端定义, 而是由服务端渲染输出, 所以 HtmlWebpackPlugin 这套逻辑不再走得通.
 
-现在 后端就需要知晓打包后的文件名, 才能正确输出文件名到index.html中.
+现在 后端就需要知晓打包后的文件名, 才能正确输出文件名到 index.html 中.
 
 ## 方案
 
@@ -44,21 +44,21 @@ output中文件有很多, 包括Entry和异步Chunk, 由于我们无法区分Ent
 并不优雅, 我想要一个循环搞定
 
 #### 编写Webpack插件导出文件名
-如果我们要区分Entry和其他文件, 那么就只能从Webpack入手, 由于Webpack太强大(复杂), 我们需要在网上找找资料, 搜索关键字: `get webpack hash`.
+如果我们要区分Entry和其他文件, 那么就只能从 Webpack 入手, 由于 Webpack 太强大(复杂), 我们需要在网上找找资料, 搜索关键字: `get webpack hash`.
 
 - [How to inject Webpack build hash to application code](https://stackoverflow.com/questions/50228128/how-to-inject-webpack-build-hash-to-application-code)
 - [webpack打包之 缓存](https://zhuanlan.zhihu.com/p/20801328?refer=jscss)
 
 他们提到一个方案: 在插件中获取需要的文件名, 输入为一个清单文件.
 
-有了这个清单文件, 后端就能读取它并注入到index.html中了.
+有了这个清单文件, 后端就能读取它并注入到 index.html 中了.
 
 不过它们提供的代码太简陋, 不能用于生产, 故继续查找资料来编写我所需要的插件:
 
 - [通过 Webpack 的 compiler 对象的 Hooks 学会编写 Webpack 插件的编写](https://cloud.tencent.com/developer/article/1470720)
 - [https://webpack.js.org/api/stats/](https://webpack.js.org/api/stats/)
 
-同时在[html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin)插件有相同功能: 将打包好的文件inject到index.html中. 所以也去翻了翻它的源码.
+同时在 [html-webpack-plugin](https://github.com/jantimon/html-webpack-plugin) 插件有相同功能: 将打包好的文件 inject 到 index.html 中. 所以也去翻了翻它的源码.
 
 最后搬运过来的代码就是这样:
 
@@ -130,7 +130,7 @@ class DumpAssetsPlugin {
 }
 ```
 
-或者, 你也可以使用我上传到NPM的包: [dump-assets-webpack-plugin](https://www.npmjs.com/package/dump-assets-webpack-plugin)
+或者, 你也可以使用我上传到 NPM 的包: [dump-assets-webpack-plugin](https://www.npmjs.com/package/dump-assets-webpack-plugin)
 
 使用方法如下:
 ```javascript

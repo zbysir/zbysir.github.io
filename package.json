@@ -2,7 +2,8 @@
   "scripts": {
     "dev": "node ./build.js",
     "build": "MODE=prod node ./build.js",
-    "preview": "hollow server"
+    "preview": "hollow server",
+    "dist": "hollow build"
   },
   "dependencies": {
     "@deanc/esbuild-plugin-postcss": "^1.0.2",
