@@ -6,16 +6,13 @@ tags: [Golang, Jsx, Blog]
 desc: 没有限制、规则，代码即所得。
 ---
 
-https://github.com/zbysir/hollow, Hollow 是一个快速、简洁静态博客生成器。目前只服务于自己，还未准备好给大家使用，文档也待完成。
+官方网站：[https://gohollow.top/](https://gohollow.top/), Hollow 是一个快速、简洁静态博客生成器。
 
 相关文章：
 - [开发 Hollow 技术总结](/blogs/dev-hollow)
 
 ## 特性
 
-- **支持部署到服务器，提供 Web UI 管理文章**
-  - 在任何地方（如手机上）管理你的文章
-  - 云端文件也支持提交到 Git 上，不怕文件丢失
 - **Js 驱动**
   - **支持 Js/Ts 作为配置文件（yaml 也支持）**
   - **使用 Jsx/Tsx 作为主题模板开发语言**
@@ -124,32 +121,4 @@ docker run -p 9400:9400 bysir/hollow:master server -t https://github.com/zbysir/
 
 - 然后将文件部署到 Github page 上
 
-## Editor
-! Editor 已经暂停开发，因为比想象中复杂
-
-hollow 支持在服务器上运行一个 Web Editor，现在我们写 blog 不用再打开笨重的编辑器了，甚至可以在手机上进行。
-
-![](../../statics/img/editor.png)
-
-Editor 特性：
-
-- 方便的上传图片等静态文件，支持上传到本地与 OSS（暂时支持七牛云）
-- 可视化文件编辑器，管理逻辑和本地文件一致。
-- 用来编辑 blog 源文件，提供富文本、markdown 编辑器。
-- 用来少量的编辑主题代码，如修复 bug，更改配置。
-
-editor 不能做的：
-
-- 主题开发：由于 hollow 运行在服务端，不自带开发环境（如 node），所以需要要使用 webpack 等构建工具还是需要在本地执行，然后将构建产物上传到 hollow 中。(在 Editor 中上传文件十分简单)。
-  同时由于 hollow 的代码编辑器肯定没有你熟悉的代码编辑器好用，所以在主题开发阶段建议还是选择你趁手的编辑器，完成之后再上传到远端。
-
-## CLI
-
-#### `hollow download`
-
-你可以用这个命令下载远端代码到本地，进行二次开发。
-在下载文件到本地时不会删除任何本地已有的文件，如果有需要清理的文件你需要手动删除。
-
-#### `hollow upload`
-
-你可以用这个命令上传的源代码到远端。
+更多文档请查看 [https://gohollow.top/](https://gohollow.top/)

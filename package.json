@@ -3,6 +3,7 @@
     "dev": "node ./build.js",
     "build": "MODE=prod node ./build.js",
     "preview": "hollow server",
+    "preview_local": "hollow server -t file://Users/bysir/front/bysir/hollow-theme/hollow",
     "dist": "hollow build"
   },
   "dependencies": {
