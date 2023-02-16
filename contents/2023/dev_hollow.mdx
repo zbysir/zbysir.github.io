@@ -11,7 +11,7 @@ https://github.com/zbysir/hollow
 
 本以为一个简单的博客系统没难度，但随着开发过程，我发现它越来越有有趣，也越来越差异化。
 
-## 文件系统
+# 文件系统
 文件系统（FileSystem）在 Golang 中有个实现即 fs 包。但它太简陋了，只能读，不能写。
 
 在 Hollow 中，FS 用来实现适配多个数据来源，如 DB、本地、远端文件，需要实现可读可写。
@@ -23,7 +23,7 @@ go-billy 自己的介绍如下：
 
 它有两个文件系统实现，其一是标准文件系统，其二是内存文件系统，标准文件系统是基础，值得说的是内存文件系统实现，它可以做文件缓存与 Mock，Hollow 用来做主题文件缓存。
 
-## 渲染 Jsx
+# 渲染 Jsx
 渲染 Jsx 的功能独立成为了一个库：[gojsx](https://github.com/zbysir/gojsx)，更多信息可以了解这个库，这里简单说下：
 
 [goja](https://github.com/dop251/goja) 是一个纯 Golang 实现的 JavaScript 解析器，支持所有 es5 特性，但不支持 es6，当然也不支持 Jsx 等高级语法，
@@ -62,12 +62,12 @@ export function Fragment(args) {
 
 最后使用 Golang 渲染这个类 Dom 树。
 
-## 预览服务
+# 预览服务
 Hollow 也提供预览功能，启动一个 http 服务，对内容的更改可以实时（刷新后）反应到浏览器中。
 
 对于任何静态文件的更改也应该是实时的，但现实是 Golang 实现的 http.FileServer 默认实现的是 200 强制缓存，并不支持更改（感觉代码有点残缺），所以需要自己魔改来支持 304 协程缓存。
 
-## 渲染 Markdown/Mdx
+# 渲染 Markdown/Mdx
 一开始渲染 Mdx 是 Hollow 自己实现的，但后面觉得存在于 [gojsx](https://github.com/zbysir/gojsx) 更合理，于是搬到了 [gojsx](https://github.com/zbysir/gojsx) 中。
 
 大体步骤如下：
@@ -79,10 +79,10 @@ Hollow 也提供预览功能，启动一个 http 服务，对内容的更改可�
 
 这里还研究聊下 sourcemap，想实现 md 文件到 jsx 文件的映射，但 goldmark 的渲染器不太好添加这个特性，要实现几乎等于重写 goldmark 的 html 渲染器，收益不大。
 
-## 加载远端文件（主题）
+# 加载远端文件（主题）
 Hollow 支持指定一个远程的 git 仓库地址作为主题，这得益于 [go-git](https://github.com/go-git/go-git) 库，go-git 底层使用的文件系统就是 [go-billy](https://github.com/go-git/go-billy)，这也是我选中 go-billy 作为 Hollow 的文件系统的原因。
 
-## 开发工程
+# 开发工程
 想体验 esbuild 的打包的速度，所以无论开发还是生产环境都使用了 esbuild 打包，结果是性能稳定，兼容性也没问题。
 
 由于需要使用到 tailwind css，我们还需要使用 esbuild-style 插件：[esbuild-style-plugin](https://www.npmjs.com/package/esbuild-style-plugin)
