@@ -3,7 +3,7 @@ title: Go 文字自动换行算法
 slug: go-text-wrap
 date: 2023-02-17
 tags: [Golang]
-draft: true
+draft: false
 desc:
 ---
 
@@ -17,9 +17,9 @@ desc:
 
 ![](img/wordbreak.png)
 
-这篇文章就是为了实现它。只不过我的使用场景是解决 "excel 文字自动换行" 问题，并且是 Go 语言。
+这篇文章就是为了实现它。只不过我的使用场景是解决 "excel 文字自动换行" 问题，并且使用 Go 语言。
 
-下面是实现要点，如果你不感兴趣的话，也可以直接使用我的包：https://github.com/zbysir/textwrap
+下面是实现要点，如果你不感兴趣的话，也可以直接使用我的包：[github.com/zbysir/textwrap](https://github.com/zbysir/textwrap)
 
 # 计算文字宽度
 由于每种字体对于每个文字的宽度设计是不一样的，比如等宽字体与非等宽字体。所以我们如果要计算文字宽度就需要处理字体文件。
@@ -56,44 +56,62 @@ func main()  {
 ```
 
 # 拆分单词
-如果获得最佳的阅读友好度，不应该在换行的时候打破一个完整的单词，所以我们需要先解析出单组。
+如果获得最佳的阅读友好度，不应该在换行时打破一个完整的单词，所以我们需要先预先计算"可以在哪里换行"。
 
-站在巨人的肩膀上看得更远，搜索 golang 的绘图库，可以找到这个库：https://github.com/fogleman/gg，其中实现了文字换行，不过对中文支持不友好，我们拿来改改。
+对于英文，我们只需要在空格处换行即可，对于汉字则每个字符都可以换行。
+
+其中难点是如何判断字符是否是"汉字"，实际比我想象中难，除了中文、日文或韩文（CJK）之外，全角符号（如。）也需要处理为可换行，偷懒一点的办法是判断是否是全角即可（CJK 都是全角），使用 "unicode/utf8" 包即可判断。
 
 ```go
 package textwrap
 
 import (
 	"unicode"
+  "unicode/utf8"
 )
 
-func splitOnSpace(x string) []string {
+// return "break opportunities" (http://unicode.org/reports/tr14/)
+func breakLine(x string) []string {
 	var result []string
 	pi := 0
-	ps := false
-	for i, c := range x {
-		isHan := unicode.Is(unicode.Han, c)
-		s := unicode.IsSpace(c) || isHan
-		if (s != ps || isHan) && i > 0 {
-			result = append(result, x[pi:i])
+	prevKind := -1
+	rs := []rune(x)
+	for i, c := range rs {
+		var kind = -1
+		if !unicode.IsSpace(c) {
+			kind = utf8.RuneLen(c)
+		}
+
+		isWide := kind >= 3
+		// break on each Wide char and space
+		if (kind != prevKind || isWide) && i != 0 {
+			result = append(result, string(rs[pi:i]))
 			pi = i
 		}
-		ps = s
+		prevKind = kind
 	}
-	result = append(result, x[pi:])
+	result = append(result, string(rs[pi:]))
 	return result
 }
 
-// on test file
+// in test file
 
-func TestSplitOnSpace(t *testing.T) {
-	line := splitOnSpace("本文实例讲述了Go语言清除文件中空行的方法。")
-	bs, _ := json.Marshal(line)
-	// ["本","文","实","例","讲","述","了","Go","语","言","清","除","文","件","中","空","行","的","方","法","。"]
-	t.Logf("%s", bs)
+func TestBreakLine(t *testing.T) {
+	lines := breakLine("标准的具体规则在Unicode 换行算法 (Unicode Line Breaking Algorithm, UAX #14）中详细给出。")
+	assert.Equal(t, []string{"标", "准", "的", "具", "体", "规", "则", "在", "Unicode", " ", "换", "行", "算", "法", " ", "(Unicode", " ", "Line", " ", "Breaking", " ", "Algorithm,", " ", "UAX", " ", "#14", "）", "中", "详", "细", "给", "出", "。"}, lines)
 }
 
 ```
+
+至此我们实现了 95% 左右的换行需求，还有 5% 呢？
+
+其实排版规则很复杂，不光是不能打破单词，比如不能将。放在行首，在《符号标点用法》中有这样一些规则：
+
+> 句号、逗号、顿号…不出现在一行之首…引号、括号、书名号…前一半不出现在一行之末，后一半不出现在一行之首  ——《标点符号用法》
+
+英文也有类似的规则，具体规则在 [Unicode 换行算法 (Unicode Line Breaking Algorithm, UAX #14)](http://unicode.org/reports/tr14/) 中详细给出。
+
+要完全满足标准排版规则的算法尤其复杂，有 JavaScript 版本的实现: [niklasvh/css-line-break](https://github.com/niklasvh/css-line-break)，而在 Golang 中没找到它的实现，这是一个大工程，所以暂不做了，95% 已满足我的需求。
 
 # 打破单个单词
 如果一行都放不下一个单词，就需要打破单词，在单词之间换行。
@@ -102,26 +120,26 @@ func TestSplitOnSpace(t *testing.T) {
 package textwrap
 
 func breakWord(s string, over func(string) bool) ([]string, string) {
-	if !over(s) {
-		return nil, s
-	}
 	var result []string
-	for {
-		for i := range s {
-			if !over(s[:i+1]) {
-				continue
+	runes := []rune(s)
+	for len(runes) != 0 && over(string(runes)) {
+		max := 0
+		for i := range runes {
+			if over(string(runes[:i+1])) {
+				max = i
+				break
 			}
+		}
 
-			result = append(result, s[:i])
-			s = s[i:]
-			break
+		if max == 0 {
+			max = 1
 		}
-		if s == "" || !over(s) {
-			break
-		}
+
+		result = append(result, string(runes[:max]))
+		runes = runes[max:]
 	}
 
-	return result, s
+	return result, string(runes)
 }
 ```
 
@@ -129,43 +147,49 @@ func breakWord(s string, over func(string) bool) ([]string, string) {
 ```go
 package textwrap
 
-func textWrap(s string, over func(string) bool) []string {
+// TextWrap Wrap text without breaking words as much as possible;
+// Support Chinese characters and super long words
+func TextWrap(s string, over func(string) bool) []string {
 	var result []string
 	for _, l := range strings.Split(s, "\n") {
-		words := splitOnSpace(l)
+		words := breakLine(l)
 		line := ""
-		for _, word := range words {
-			testLine := line + word
-			if over(testLine) {
-				if strings.TrimSpace(line) != "" {
-					i, s2 := breakWord(line, over)
-					result = append(result, i...)
-
-					// 将最后一行尝试拼接下一个单词，如果超出，则不拼接
-					// case:
-					//  Unite
-					//  d St
-					if !over(s2 + word) {
-						line = s2 + word
-					} else {
-						if s2 != "" {
-							result = append(result, s2)
-						}
-						line = word
-					}
-				} else {
-					line = word
-				}
-			} else {
+		for _, next := range words {
+			testLine := line + next
+			if !over(testLine) {
 				line = testLine
+				continue
 			}
+
+			if strings.TrimSpace(line) == "" {
+				line = next
+				continue
+			}
+
+			i, last := breakWord(line, over)
+			result = append(result, i...)
+			// 如果一个单词被分为了多行则需要处理最后一行，尝试拼接 next
+			//  case:
+			//  |Unite|
+			//  |d St |
+			if last != "" {
+				if !over(last + next) {
+					line = last + next
+					continue
+				} else {
+					result = append(result, last)
+				}
+			}
+
+			// 超出之后下一个单词就是下一行的开始
+			line = next
 		}
 
 		if strings.TrimSpace(line) != "" {
-			word, s2 := breakWord(line, over)
+			word, last := breakWord(line, over)
 			result = append(result, word...)
-			if s2 != "" {
-				result = append(result, s2)
+			if last != "" {
+				result = append(result, last)
 			}
 		}
 	}
@@ -180,7 +204,9 @@ func textWrap(s string, over func(string) bool) []string {
 
 # 完整代码
 
-已发布到 Github
+已发布到 Github [zbysir/textwrap](https://github.com/zbysir/textwrap)。
+
+快速使用：
 ```bash
 go get github.com/zbysir/textwrap
 ```
