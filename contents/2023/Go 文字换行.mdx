@@ -15,11 +15,13 @@ desc:
 
 能不能最大程度的不打破单词，当一行放不下一个单词才打破单词呢？这样能得到一个最优的排版，如下图
 
-![](img/wordbreak.png)
+![](img/wordbreak-css-breakwords.png)
 
-这篇文章就是为了实现它。只不过我的使用场景是解决 "excel 文字自动换行" 问题，并且使用 Go 语言。
+在 css 中，我们可以使用 ['overflow-wrap: break-word;'](https://developer.mozilla.org/zh-CN/docs/Web/CSS/overflow-wrap) 来达到目的。
 
-下面是实现要点，如果你不感兴趣的话，也可以直接使用我的包：[github.com/zbysir/textwrap](https://github.com/zbysir/textwrap)
+这篇文章将讲解如何使用 Golang 实现它的算法。我的使用场景是解决 "excel 文字自动换行" 问题。
+
+下面是它的实现要点，如果你不感兴趣的话，也可以直接使用我的包：[github.com/zbysir/textwrap](https://github.com/zbysir/textwrap)
 
 # 计算文字宽度
 由于每种字体对于每个文字的宽度设计是不一样的，比如等宽字体与非等宽字体。所以我们如果要计算文字宽度就需要处理字体文件。
