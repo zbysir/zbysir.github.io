@@ -17,15 +17,23 @@ import hollow from "@bysir/hollow";
 将包括科学，生活，编程，我自己，是个大杂烩。
 
 <>
-  {hollow.getContents('./contents/2023/一百个为什么',
-    {
-      sort: (a, b) => a.meta?.sort < b.meta?.sort,
-      filter: (a) => (a.meta?.draft !== true)
-    }).list.map(i => {
-    return <>
-      <h2 id={i.meta?.hash}>{i.meta?.title}</h2>
-      <Tags tags={i.meta?.tags}/>
-      <div dangerouslySetInnerHTML={{__html: i.content}}></div>
-    </>
-  })}
+  <div id="whys-item">
+    {hollow.getContents('./contents/2023/一百个为什么',
+      {
+        sort: (a, b) => a.meta?.sort < b.meta?.sort,
+        filter: (a) => (a.meta?.draft !== true)
+      }).list.map(i => {
+      return <div data-json={JSON.stringify({tags: i.meta?.tags})}>
+        <h2 id={i.meta?.hash}>{i.meta?.title}</h2>
+        <Tags tags={i.meta?.tags}/>
+        <div dangerouslySetInnerHTML={{__html: i.content}}></div>
+      </div>
+    })}
+  </div>
+</>
+
+
+<>
+  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"/>
+  <script dangerouslySetInnerHTML={{__html: hollow.builtinAssert && hollow.builtinAssert('./contents/2023/js/whys.js')}}></script>
 </>

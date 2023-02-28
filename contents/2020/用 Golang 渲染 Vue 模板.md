@@ -61,7 +61,7 @@ SSR有一个优点就是首屏直出，是不是就能解决首屏慢的问题�
 </template>
 ```
 我们将这个组件命名为消息提示组件，它可能是这个样子
-![element-ui alert](https://upload-images.jianshu.io/upload_images/3447621-a6dcbccd060be362.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
+![消息提示组件](消息提示组件.png)
 
 ### 1. 解析 html 成节点树
 解析 html 比我想象中复杂，这是因为有自闭合和不闭合的标签，如`<meta charset="UTF-8">`，如果使用xml的处理逻辑的话需要做很多额外判断，为了不重复造轮子，最终选用`golang.org/x/net/html`包来解析html，不过值得注意的是正规的 html 格式有一些要求：如 select 里只能包含 option 子节点，但 Vue 模板由于有自定义组件和 slot 语法等，可能不满足 html 的要求，这会让 html 包无法正确解析出节点，由于没有更好的解析包作为代替，无奈只好魔改一点 html 包了。
