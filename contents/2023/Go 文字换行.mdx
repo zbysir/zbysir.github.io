@@ -23,7 +23,7 @@ desc:
 
 下面是它的实现要点，如果你不感兴趣的话，也可以直接使用我的包：[github.com/zbysir/textwrap](https://github.com/zbysir/textwrap)
 
-# 计算文字宽度
+## 计算文字宽度
 由于每种字体对于每个文字的宽度设计是不一样的，比如等宽字体与非等宽字体。所以我们如果要计算文字宽度就需要处理字体文件。
 
 不用担心，测量字体与解析字体都已经有成熟的库了：golang.org/x/image，获取宽度的代码如下：
@@ -57,7 +57,7 @@ func main()  {
 
 ```
 
-# 拆分单词
+## 拆分单词
 如果获得最佳的阅读友好度，不应该在换行时打破一个完整的单词，所以我们需要先预先计算"可以在哪里换行"。
 
 对于英文，我们只需要在空格处换行即可，对于汉字则每个字符都可以换行。
@@ -115,7 +115,7 @@ func TestBreakLine(t *testing.T) {
 
 要完全满足标准排版规则的算法尤其复杂，有 JavaScript 版本的实现: [niklasvh/css-line-break](https://github.com/niklasvh/css-line-break)，而在 Golang 中没找到它的实现，这是一个大工程，所以暂不做了，95% 已满足我的需求。
 
-# 打破单个单词
+## 打破单个单词
 如果一行都放不下一个单词，就需要打破单词，在单词之间换行。
 
 ```go
@@ -145,7 +145,7 @@ func breakWord(s string, over func(string) bool) ([]string, string) {
 }
 ```
 
-# 换行代码
+## 换行代码
 ```go
 package textwrap
 
@@ -204,7 +204,7 @@ func TextWrap(s string, over func(string) bool) []string {
 
 ```
 
-# 完整代码
+## 完整代码
 
 已发布到 Github [zbysir/textwrap](https://github.com/zbysir/textwrap)。
 
@@ -213,5 +213,5 @@ func TextWrap(s string, over func(string) bool) []string {
 go get github.com/zbysir/textwrap
 ```
 
-# 参考文章
+## 参考文章
 - https://www.cosformula.org/canvas-text-wrap

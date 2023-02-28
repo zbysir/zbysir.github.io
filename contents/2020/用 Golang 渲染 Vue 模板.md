@@ -10,7 +10,7 @@ tags: [Vue, Golang]
 
 笔者的回答是香，也不香，确实 Vue 用它简单易上手的特性得到了很多人喜爱，也包括我，所以当我需要服务端渲染的时候，也自然的使用了 vue-ssr ，选用的 [nuxtjs.org](https://nuxtjs.org/guide/)框架，但事物总有好有坏，很快我就发现了它的问题。
 
-#### 性能低
+### 性能低
 
 如果项目是一个后台管理系统，那么首屏渲染速度和运行时的性能可能不怎么重要，但如果是一个面向C端的网站，响应速度却十分总要，因为这直接影响到用户体验。
 
@@ -25,7 +25,7 @@ SSR有一个优点就是首屏直出，是不是就能解决首屏慢的问题�
 
 在我参与的项目中，由于页面功能复杂，一个页面需要500ms左右的渲染时间，也由于有动态路由参数的功能存在，没办法像静态页面一样加上缓存，就导致了在并发稍微高一点之后，响应速度越来越慢。
 
-#### 可扩展性低
+### 可扩展性低
 大量的代码被封装到了 nuxt 里, 过多的配置项被放在了 nuxt.config.js 中, 不够灵活就导致了很多特性没办法实现:
  
 - 如要修改 head 必须修改 meta, 但 vue-meta 配置是有限的, 比如不支持meta标签闭合(可恶的搜狗站长认证需要闭合的meta标签).
@@ -63,15 +63,15 @@ SSR有一个优点就是首屏直出，是不是就能解决首屏慢的问题�
 我们将这个组件命名为消息提示组件，它可能是这个样子
 ![element-ui alert](https://upload-images.jianshu.io/upload_images/3447621-a6dcbccd060be362.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240)
 
-#### 1. 解析 html 成节点树
+### 1. 解析 html 成节点树
 解析 html 比我想象中复杂，这是因为有自闭合和不闭合的标签，如`<meta charset="UTF-8">`，如果使用xml的处理逻辑的话需要做很多额外判断，为了不重复造轮子，最终选用`golang.org/x/net/html`包来解析html，不过值得注意的是正规的 html 格式有一些要求：如 select 里只能包含 option 子节点，但 Vue 模板由于有自定义组件和 slot 语法等，可能不满足 html 的要求，这会让 html 包无法正确解析出节点，由于没有更好的解析包作为代替，无奈只好魔改一点 html 包了。
 
-#### 2. 解析 vue 模板语法
+### 2. 解析 vue 模板语法
 这一步十分简单，我们只需要递归遍历 html 节点数中的节点，根据节点的 attr，再生成一个 vue 节点结构体，其中包含如 porps，v-if 等信息。这一步是为了方便的从节点树生成 Golang 代码。
 
-#### 3. 生成 Go 代码
+### 3. 生成 Go 代码
 
-##### 递归节点
+#### 递归节点
 我们需要根据节点生成 Go 代码，特别要处理的是 vue 的各个指令，如 v-if 需要生成如下的 Go 代码
 ```go
 var s = ""
@@ -93,7 +93,7 @@ return s
 ```
 这里不难，唯一难点是 v-if / v-else / v-else-if 的关联关系，我也是参考 vue 官方的模板处理方法才实现的。
 
-##### 解析 Js AST
+#### 解析 Js AST
 在 `v-if` 或者 `{{}}` 中需要使用一些 js 表达式，如 `v-if="a!=b && a!=c"`，幸运的是 Golang 有一个库可以解析 JS AST: [https://github.com/robertkrimen/otto](https://github.com/robertkrimen/otto), 唯一不足就是只支持ES5, 不过ES5在模板中足够了.
 
 得到 Js AST 之后就需要将 AST 翻译成 Golang，难度不大，多写几个 switch case 就好。代码[在此](https://github.com/zbysir/go-vue-ssr/blob/master/pkg/vuessr/ast/go.go#L10)

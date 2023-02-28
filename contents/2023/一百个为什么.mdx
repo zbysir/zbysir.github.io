@@ -1,0 +1,31 @@
+---
+title: 一百个为什么
+slug: whys
+date: 2023-02-15
+tags: [笔记, 生活]
+draft: true
+desc:
+---
+
+import Tags from "./Tags";
+import hollow from "@bysir/hollow";
+
+小时候父亲给我买了十万个为什么，成为了我第一本爱看的图书。但生活却不止十万个为什么，依然有太多的东西需要去学习与记忆。于是我想记下我需要的为什么，以免日后忘记，通常它们比较短小，合适组成一个合集。
+
+那先小定一个小目标，叫 一百个为什么。
+
+将包括科学，生活，编程，我自己，是个大杂烩。
+
+<>
+  {hollow.getContents('./contents/2023/一百个为什么',
+    {
+      sort: (a, b) => a.meta?.sort < b.meta?.sort,
+      filter: (a) => (a.meta?.draft !== true)
+    }).list.map(i => {
+    return <>
+      <h2 id={i.meta?.hash}>{i.meta?.title}</h2>
+      <Tags tags={i.meta?.tags}/>
+      <div dangerouslySetInnerHTML={{__html: i.content}}></div>
+    </>
+  })}
+</>
