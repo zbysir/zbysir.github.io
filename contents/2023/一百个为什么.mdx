@@ -9,6 +9,18 @@ desc:
 
 import Tags from "./Tags";
 import hollow from "@bysir/hollow";
+const contents = hollow.getContents('./contents/2023/一百个为什么',
+  {
+    sort: (a, b) => a.meta?.sort < b.meta?.sort,
+    filter: (a) => (a.meta?.draft !== true)
+  }).list
+let tags = contents.reduce((acc, i) => {
+  if (i.meta?.tags) {
+    return acc.concat(i.meta?.tags)
+  }
+  return acc;
+}, []);
+tags = [...new Set(tags)];
 
 小时候父亲给我买了十万个为什么，成为了我第一本爱看的图书。但生活却不止十万个为什么，依然有太多的东西需要去学习与记忆。于是我想记下我需要的为什么，以免日后忘记，通常它们比较短小，合适组成一个合集。
 
@@ -17,14 +29,22 @@ import hollow from "@bysir/hollow";
 将包括科学，生活，编程，我自己，是个大杂烩。
 
 <>
-  <div id="whys-item">
-    {hollow.getContents('./contents/2023/一百个为什么',
-      {
-        sort: (a, b) => a.meta?.sort < b.meta?.sort,
-        filter: (a) => (a.meta?.draft !== true)
-      }).list.map(i => {
-      return <div data-json={JSON.stringify({tags: i.meta?.tags})}>
-        <h2 id={i.meta?.hash}>{i.meta?.title}</h2>
+  <div x-data="{ selected: ''}">
+    <div className={'flex flex-wrap space-x-2'}>
+      {tags.map(t => <span className="opacity-50 cursor-pointer" x-on:click={`selected = selected==='${t}'?'':'${t}'`} x-bind:class={`selected !== '${t}'?'opacity-50':'opacity-100'`}>#{t}</span>)}
+    </div>
+    {contents.map(i => {
+      return <div
+        data-json={JSON.stringify({tags: i.meta?.tags})}
+        x-show={`selected.length===0 || ${JSON.stringify(i.meta?.tags)}.indexOf(selected) != -1`}
+        x-transition:enter="ease-in-out duration-500"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="ease-in-out duration-500"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+      >
+        <h2 id={i.meta?.hash || i.meta?.title}>{i.meta?.title}</h2>
         <Tags tags={i.meta?.tags}/>
         <div dangerouslySetInnerHTML={{__html: i.content}}></div>
       </div>
@@ -32,8 +52,4 @@ import hollow from "@bysir/hollow";
   </div>
 </>
 
-
-<>
-  <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"/>
-  <script dangerouslySetInnerHTML={{__html: hollow.builtinAssert && hollow.builtinAssert('./contents/2023/js/whys.js')}}></script>
-</>
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"/>
