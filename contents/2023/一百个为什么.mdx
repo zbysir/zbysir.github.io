@@ -1,9 +1,9 @@
 ---
 title: 一百个为什么
 slug: whys
-date: 2023-02-15
+date: 2023-02-18
 tags: [笔记, 生活]
-draft: true
+draft: false
 desc:
 ---
 
@@ -37,6 +37,7 @@ tags = [...new Set(tags)];
       return <div
         data-json={JSON.stringify({tags: i.meta?.tags})}
         x-show={`selected.length===0 || ${JSON.stringify(i.meta?.tags)}.indexOf(selected) != -1`}
+        x-collapse
         x-transition:enter="ease-in-out duration-500"
         x-transition:enter-start="opacity-0"
         x-transition:enter-end="opacity-100"
@@ -52,4 +53,5 @@ tags = [...new Set(tags)];
   </div>
 </>
 
+<script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
 <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"/>
