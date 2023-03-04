@@ -31,7 +31,11 @@ tags = [...new Set(tags)];
 <>
   <div x-data="{ selected: ''}">
     <div className={'flex flex-wrap space-x-2'}>
-      {tags.map(t => <span className="opacity-50 cursor-pointer" x-on:click={`selected = selected==='${t}'?'':'${t}'`} x-bind:class={`selected !== '${t}'?'opacity-50':'opacity-100'`}>#{t}</span>)}
+      {tags.map(t => <span
+        className="opacity-50 cursor-pointer transition-opacity"
+        x-on:click={`selected = selected==='${t}'?'':'${t}'`}
+        x-bind:class={`selected !== '${t}'?(selected?'opacity-30':'opacity-50'):'opacity-100'`}
+      >#{t}</span>)}
     </div>
     {contents.map(i => {
       return <div
