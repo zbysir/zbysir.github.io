@@ -264,7 +264,6 @@ func (u BookUsecaseWithPermission) DeleteById(id int64) error {
 *   代码逻辑可以独立文件，可以实现代码自动生成。
 
 
-
 ## QA
 
 ### Q：代码应该放在 Usecase 还是 Repository ？
@@ -342,6 +341,22 @@ func (u AuthorUsecase) Delete(ctx context.Context, id int64) (err error) {
 ```
 
 至于如何选择，还请根据团队喜好、实际业务场景而定。
+
+
+### Q：在同一层的封装可以互相引用吗？
+
+不建议，原因如下：
+- 不符合向下依赖的原则
+- 会导致循环依赖
+- 会导致代码的耦合度增加
+
+但有时候好像我们有这样的需求，应该如何解决?
+
+比如在 AuthorUsecase 中需要返回 Book 列表，但 Book 列表的逻辑封装在 BookUsecase 中，看起来必须在 AuthorUsecase 中引用 BookUsecase 才行。
+
+不过还有更好的做法：
+- 将 BookUsecase 中处理 Book 列表的逻辑独立出来，放到底层，如 Model 中.不过这个方法不一定适用于所有场景。
+- AuthorUsecase 只返回作者信息，BookUsecase 提供一个根据作者信息返回 Book 列表的方法，然后再更上层（如 Service 层）组装它俩的数据。 
 
 ## 参考资料
 
