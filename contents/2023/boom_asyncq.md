@@ -26,18 +26,21 @@ Asyncq 过去一年在公司业务中调度了超过 5000w 个任务，确实高
 现在空下来研究下它的实现原理，发现比想象中更复杂也有趣。
 
 ## 总体流程
-- 入队：
-  - 使用 有序集合 `scheduled` 记录异步任务。
-  - 如果不是延时任务（立即执行），则直接加入到 `pending` 队列。
-- 前进：
-  - 使用 `ZRANGEBYSCORE` 定时从 `scheduled` 和 `retry` 队列查询到期的任务，并使用 `ZREM` 删除 任务，并插入到 `pending` 队列。 （！必须使用 script 才能满足原子性）
-- 出队：
-  - 使用 `RPOPLPUSH` 将`pending` 的任务放入`active` 队列，并将任务放在有序集合 `lease`（延时 30 s）
-- 执行任务：
-  - 成功执行了之后 将任务从 `active` 和 `lease` 移除，然后存入归档。
-  - 执行失败，执行 retry：将任务从 `active` 和 `lease` 移除，（如果没有移除成功，则不做任何处理），放入有序集合 `retry` （延时 N s）
-  - 如果服务正在退出则重入队列：将任务从 `active` 移除，从`lease` 移除，添加到 `pending` 队列。
-  - 超时没有 ACK：定时从 `lease` 取出任务，检查最大重试次数，如果没有超过最大重试次数就执行 retry。否则就存档标记为失败。（注意这里可以不使用 script 实现原子操作，因为 retry 命令是幂等的。）
+### 入队
+- 使用 有序集合 `scheduled` 记录异步任务。
+- 如果不是延时任务（立即执行），则直接加入到 `pending` 队列。
+
+### 前进
+- 使用 `ZRANGEBYSCORE` 定时从 `scheduled` 和 `retry` 队列查询到期的任务，并使用 `ZREM` 删除 任务，并插入到 `pending` 队列。 （！必须使用 script 才能满足原子性）
+
+### 出队
+- 使用 `RPOPLPUSH` 将`pending` 的任务放入`active` 队列，并将任务放在有序集合 `lease`（延时 30 s）
+
+### 执行任务
+- 成功执行了之后 将任务从 `active` 和 `lease` 移除，然后存入归档。
+- 执行失败，执行 retry：将任务从 `active` 和 `lease` 移除，（如果没有移除成功，则不做任何处理），放入有序集合 `retry` （延时 N s）
+- 如果服务正在退出则重入队列：将任务从 `active` 移除，从`lease` 移除，添加到 `pending` 队列。
+- 超时没有 ACK：定时从 `lease` 取出任务，检查最大重试次数，如果没有超过最大重试次数就执行 retry。否则就存档标记为失败。（注意这里可以不使用 script 实现原子操作，因为 retry 命令是幂等的。）
 
 ```mermaid
 %%{init: {'theme':'default'}}%%
