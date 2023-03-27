@@ -1,5 +1,5 @@
 ---
-title: 💥爆破 Asyncq
+title: 💥 爆破 Asyncq
 slug: boom_asyncq
 date: 2023-03-27
 tags: [Golang, Redis, Asyncq, Delay Queue]
@@ -21,7 +21,7 @@ Asyncq 这样介绍自己：
 > 
 > Asynq 是一个 Go 库，用于排队任务并通过工作者异步处理这些任务。它由 Redis 支持，被设计成可扩展且容易上手。
 
-Asyncq 过去一年在公司业务中调度了超过 5000w 个任务，确实高效没出过问题，并且使用的 Redis 人手都有，部署难度很低。
+Asyncq 过去一年在公司业务中调度了超过 5000w 个任务，确实高效且稳定，并且使用的 Redis 人手都有，部署难度很低。
 
 现在空下来研究下它的实现原理，发现比想象中更复杂也有趣。
 
