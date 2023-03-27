@@ -1,7 +1,14 @@
 export const hollow = {
     theme: 'https://github.com/zbysir/hollow-theme/tree/master/hollow',
     // theme: 'file://Users/bysir/front/bysir/hollow-theme/hollow',
-    assets: ['statics']
+    assets: ['statics'],
+    options: {
+        markdown: {
+            mermaid_jS: "https://unpkg.com/mermaid@9/dist/mermaid.min.js",
+            no_script: false,
+            theme: "",
+        }
+    }
 }
 
 export const theme = {
