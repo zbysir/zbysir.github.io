@@ -26,6 +26,4 @@ anchor:
 
 还对创作音乐、画画、游戏感兴趣，我也想更加浪漫。
 
-这还有一些项目是我做的 😉：
-
-- [音乐舞台](https://github.com/zbysir/bgm-stage)
+如果你还想了解我的更多项目，请跳转到 [Projects 页面](/projects) 😉
