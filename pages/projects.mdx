@@ -1,0 +1,64 @@
+import hollow from "@bysir/hollow";
+import Banner from "./component/Banner";
+const contents = [
+  {
+    "title": "MerryFlow",
+    "desc": "拖拽出自己的 AI 工作流",
+    "images": ["../statics/img/merryflow.png"],
+    "footer": "<a href='https://github.com/zbysir/writeflow' class='text-blue-500'>Github</a>",
+  },
+  {
+    "title": "竹子建站",
+    "desc": "公司项目，作为技术负责人从 0 到 1 架构整个系统",
+    "images": ["../statics/img/zhuzi-website.png", "../statics/img/zhuzi-editor.png"],
+    "footer": "<a href='https://www.zhuzi.com.cn' class='text-blue-500'>Website</a>",
+  },
+  {
+    "title": "BGM Stage",
+    "desc": "音乐舞台。曾用于在我的婚礼上切换 BGM，可以快速的根据进度淡入淡出的切换 BGM。",
+    "images": ["../statics/img/bgm-stage.png"],
+    "footer": "<a href='https://github.com/zbysir/bgm-stage' class='text-blue-500'>Github</a> / " +
+      "<a href='https://bgm.bysir.top/' class='text-blue-500'>Online</a>",
+  },
+  {
+    "title": "Hollow",
+    "desc": "你所看到的页面就是由 Hollow 构建的",
+    "images": ["../statics/img/hollow1.png", "../statics/img/hollow2.png", "../statics/img/hollow3.png"],
+    "footer": "<a href='https://github.com/zbysir/hollow' class='text-blue-500'>Github</a>",
+  }
+]
+const col = (contents) => {
+  return contents.map(i => (
+    <div className={"mb-8"}>
+      <h3>{i.title}</h3>
+      <p>{i.desc}</p>
+      <Banner sliders={i.images.map(img => (
+        <img className={"mb-2"} src={img} alt={i.desc}/>
+      ))}>
+      </Banner>
+      {
+        i.footer ? <div dangerouslySetInnerHTML={{__html: i.footer}}></div> : null
+      }
+    </div>
+  ))
+}
+
+## 项目
+
+一下是主要由我负责的项目，想分享于你。如果你也对它们有兴趣，欢迎与我联系。
+
+  <>
+    <div className="
+        grid grid-cols-1 md:grid-cols-2 gap-4
+        auto-rows-auto auto-cols-auto grid-flow-row
+        ">
+      <div className={"divide-y divide-dashed"}>
+        {col(contents.filter((i, index) => index % 2 === 0))}
+      </div>
+      <div className={"divide-y divide-dashed"}>
+        {col(contents.filter((i, index) => index % 2 === 1))}
+      </div>
+    </div>
+  </>
+
+<script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"/>
