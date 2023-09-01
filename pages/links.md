@@ -1,5 +1,5 @@
 ## 朋友们
-- merry http://lmrone.top
+- merry https://merrylmr.top/
 - ache https://blog.ache.fun/
 - 驱蚊器喵的插座 https://blog.meow.page/
 
