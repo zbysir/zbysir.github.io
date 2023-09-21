@@ -1,5 +1,5 @@
 ---
-title: 💥 爆破 Asynq
+title: 爆破 💥 Asynq
 slug: boom_asynq
 date: 2023-03-27
 tags: [Golang, Redis, Asyncq, Delay Queue]
