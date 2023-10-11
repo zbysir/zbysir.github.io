@@ -3,13 +3,13 @@ import Banner from "./component/Banner";
 const contents = [
   {
     "title": "MerryFlow",
-    "desc": "拖拽出自己的 AI 工作流",
+    "desc": "拖拽出自己的 AI 工作流。",
     "images": ["../statics/img/merryflow.png"],
     "footer": "<a href='https://github.com/zbysir/writeflow'>Github</a>",
   },
   {
     "title": "竹子建站",
-    "desc": "公司项目，作为技术负责人从 0 到 1 架构整个系统",
+    "desc": "公司项目，作为技术负责人从 0 到 1 架构整个系统，80%+ 的前后端代码由我和 <a href='https://merrylmr.top/'>另一个伙伴</a> 两人编写。",
     "images": ["../statics/img/zhuzi-website.png", "../statics/img/zhuzi-editor.png"],
     "footer": "<a href='https://www.zhuzi.com.cn'>Website</a>",
   },
@@ -22,7 +22,7 @@ const contents = [
   },
   {
     "title": "Hollow",
-    "desc": "你所看到的页面就是由 Hollow 构建的",
+    "desc": "你所看到的页面就是由 Hollow 构建的。",
     "images": ["../statics/img/hollow1.png", "../statics/img/hollow2.png", "../statics/img/hollow3.png"],
     "footer": "<a href='https://github.com/zbysir/hollow' class='text-blue-500'>Github</a> /" +
       "<a href='https://gohollow.top/'>Document</a>",
@@ -31,8 +31,8 @@ const contents = [
 const col = (contents) => {
   return contents.map(i => (
     <div className={"mb-8"}>
-      <h3>{i.title}</h3>
-      <p>{i.desc}</p>
+      <h3 dangerouslySetInnerHTML={{__html:i.title}}></h3>
+      <p dangerouslySetInnerHTML={{__html:i.desc}}></p>
       <Banner sliders={i.images.map(img => (
         <img className={"mb-2"} src={img} alt={i.desc}/>
       ))}>
