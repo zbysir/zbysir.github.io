@@ -80,7 +80,7 @@ services:
 
 值得注意的是 Swap 并不是无损的, 相反的, 它十分慢(使用磁盘代替内存), 我们应该禁用它。
 
-不过 compose file v3并不支持 memory-swap limit 的设置, 唉。
+不过 compose file v3 并不支持 memory-swap limit 的设置, 唉。
 
 - [Docker stack deploy with compose file (version 3) memory-swap/memory-swappiness issue](https://github.com/moby/moby/issues/33742)
 - [How to replace memswap_limit in docker compose 3?](https://stackoverflow.com/questions/44325949/how-to-replace-memswap-limit-in-docker-compose-3)
@@ -107,4 +107,4 @@ WARNING: No swap limit support
 
 再按照[文档](https://docs.docker.com/engine/install/troubleshoot/#kernel-cgroup-swap-limit-capabilities)指示操作下。
 
-问题解决。
+再继续观察一段时间，哦 对了，memory-swap 不支持在 stack 模式下设置的问题在三年后（写文到现在）依然没人解决，有 [MR](https://github.com/moby/moby/pull/37872) 都不合。
