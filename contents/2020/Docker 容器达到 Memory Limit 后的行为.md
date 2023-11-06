@@ -17,7 +17,7 @@ version: '3.7'
 services:
   mysql:
     image: mysql:5.7
-    deploy:load blog
+    deploy:
       resources:
         limits:
           memory: 200M
@@ -27,10 +27,10 @@ services:
         delay: 5s
 ```
 
-> 本文使用3.7版本的配置文件语法和swarm模式举例, 其他环境会有些差异, 其他版本的配置文件语法可以在官方文档-[compose-file](https://docs.docker.com/compose/compose-file/)
+> 本文使用 3.7 版本的配置文件语法和 swarm 模式举例, 其他环境会有些差异, 其他版本的配置文件语法可以在官方文档-[compose-file](https://docs.docker.com/compose/compose-file/)
 中找到.
 
-> 更多语法, 如限制CPU等, 可以查阅[resource_constraints](https://docs.docker.com/config/containers/resource_constraints/)
+> 更多语法, 如限制 CPU 等, 可以查阅[resource_constraints](https://docs.docker.com/config/containers/resource_constraints/)
 
 接下来我们来理解上面的配置
 
@@ -78,15 +78,33 @@ services:
 
 这是因为我们还忽略了一个参数: memory-swap, 当没有设置 memory-swap 时它的值会是 memory-limit 的两倍, 假如设置了 limit-memory=300M, 没有设置 memory-swap, 这意味着容器可以使用300M内存和300M Swap. [https://docs.docker.com/config/containers/resource_constraints/#--memory-swap-details](https://docs.docker.com/config/containers/resource_constraints/#--memory-swap-details)
 
-值得注意的是 Swap 并不是无损的, 相反的, 它十分慢(使用磁盘代替内存), 我们应该禁用它.
+值得注意的是 Swap 并不是无损的, 相反的, 它十分慢(使用磁盘代替内存), 我们应该禁用它。
 
-不过 compose file v3并不支持memory-swap limit 的设置, 唉.
+不过 compose file v3并不支持 memory-swap limit 的设置, 唉。
 
 - [Docker stack deploy with compose file (version 3) memory-swap/memory-swappiness issue](https://github.com/moby/moby/issues/33742)
 - [How to replace memswap_limit in docker compose 3?](https://stackoverflow.com/questions/44325949/how-to-replace-memswap-limit-in-docker-compose-3)
 
-无奈, 那就关闭主机的swap吧.
+无奈, 那就关闭主机的 swap 吧。
 
 总结 当容器达到内存限制时会发送的事情:
-- 容器被 Kill 并重启. 解决办法是限制程序使用的内存, 如 redis 配置 maxmemory，或者将 mysql 的配置降低.
-- 如果开启了 swap 则还有 swap 的副作用: 过高的磁盘占用和无比慢的响应时间，解决办法是关闭主机的 swap.
+- 容器被 Kill 并重启. 解决办法是限制程序使用的内存, 如 redis 配置 maxmemory，或者将 mysql 的配置降低。
+- 如果开启了 swap 则还有 swap 的副作用: 过高的磁盘占用和无比慢的响应时间，解决办法是关闭主机的 swap。
+
+2023-11-06 更新：
+
+虽然我关闭了主机的 swap，但有时候容器再达到 99% 内存使用的时候，不会在继续增长内存使用量而 OOM，而是启用了 swap，导致磁盘读取 100%，程序陷入假死状态。
+
+再次 google：`docker swap` 得到官方文档：https://docs.docker.com/config/containers/resource_constraints/
+
+Many of these features require your kernel to support Linux capabilities. To check for support, you can use the docker info command. If a capability is disabled in your kernel, you may see a warning at the end of the output like the following:
+
+```
+WARNING: No swap limit support
+```
+
+原来 swap limit 还需要配置才能支持？试试吧。
+
+再按照[文档](https://docs.docker.com/engine/install/troubleshoot/#kernel-cgroup-swap-limit-capabilities)指示操作下。
+
+问题解决。
