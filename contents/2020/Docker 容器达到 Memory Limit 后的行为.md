@@ -108,3 +108,7 @@ WARNING: No swap limit support
 再按照[文档](https://docs.docker.com/engine/install/troubleshoot/#kernel-cgroup-swap-limit-capabilities)指示操作下。
 
 再继续观察一段时间，哦 对了，memory-swap 不支持在 stack 模式下设置的问题在三年后（写文到现在）依然没人解决，有 [MR](https://github.com/moby/moby/pull/37872) 都不合。
+
+2024-03-07 更新：
+
+实验证明关闭主机的 swap 不能控制 docker 使不使用 swap。

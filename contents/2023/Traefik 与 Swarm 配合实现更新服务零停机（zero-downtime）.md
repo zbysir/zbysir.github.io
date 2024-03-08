@@ -84,7 +84,7 @@ services:
 
 你会看到我声明了 network，这是因为我把应用和基础服务（如 db）分成了多个 stack.yaml，这种情况下如果需要互相联通网络就需要声明一个外部的网络，而不是使用默认情况下创建的网络（默认情况下docker 会为每个 stack.yaml 文件创建一个相互隔离的网络）。
 
-在文档中也说了，我们不应该使用默认的网络用作生产环境，而是自己创建一个：
+在 Docker network 官方文档中也说了，我们不应该使用默认的网络用作生产环境，而是自己创建一个：
 
 https://docs.docker.com/network/network-tutorial-overlay/
 
@@ -118,7 +118,6 @@ services:
     networks:
       - traefik
 ```
-
 
 
 ## 配置 Swarm 滚动更新
@@ -169,9 +168,9 @@ traefik 通过监听 container 上的 label 来使用路由更新，在更新服
 
 而如何通知到 traefik 应该下线哪个 container 呢？翻看文档没有发现端倪。
 
-但发现了的 traefik 文档单独有一篇文章讲了 swarm，仔细看了后发现 traefix 是如何解决上述问题的
+但发现了的 traefik 文档单独有一篇文章讲了 swarm，仔细看了后明白了 traefik 是如何解决上述问题的
 
-## 配置启用 trafik swarm mode
+## 配置启用 traefik swarm mode
 
 traefik 无法知道哪个 container 需要下线，但是 swarm 是知道的，并且 swarm 自己也提供了机制来自动负载多个服务的副本，这就是 overlay 网络。https://docs.docker.com/network/drivers/overlay/
 

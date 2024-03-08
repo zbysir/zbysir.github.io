@@ -11,7 +11,7 @@ import Tags from "./Tags";
 import hollow from "@bysir/hollow";
 const contents = hollow.getContents('./contents/2023/一百个为什么',
   {
-    sort: (a, b) => a.meta?.sort < b.meta?.sort,
+    sort: (a, b) => a.meta?.sort > b.meta?.sort,
     filter: (a) => (a.meta?.draft !== true)
   }).list
 let tags = contents.reduce((acc, i) => {
