@@ -72,11 +72,11 @@ services:
 
 这就需要我们额外对程序进行配置, 如 redis 的 maxmemory 配置, java 的 JVM 配置, 不幸的是并不是所有程序都有自带的内存限制配置, 如 mysql, 这种情况下建议调低程序性能 和 保证留够的程序需要的内存.
 
-> 这篇文章有提到如何调整mysql内存: [https://marcopeg.com/2016/dockerized-mysql-crashes-lot](https://marcopeg.com/2016/dockerized-mysql-crashes-lot)
+> 这篇文章有提到如何调整 mysql 内存: [https://marcopeg.com/2016/dockerized-mysql-crashes-lot](https://marcopeg.com/2016/dockerized-mysql-crashes-lot)
 
 如果你的服务器开启了 Swap, 有可能还会遇到一个问题: 当容器将要达到内存限制时会变得特别慢并且磁盘 IO 很高(达到顶峰).
 
-这是因为我们还忽略了一个参数: memory-swap, 当没有设置 memory-swap 时它的值会是 memory-limit 的两倍, 假如设置了 limit-memory=300M, 没有设置 memory-swap, 这意味着容器可以使用300M内存和300M Swap. [https://docs.docker.com/config/containers/resource_constraints/#--memory-swap-details](https://docs.docker.com/config/containers/resource_constraints/#--memory-swap-details)
+这是因为我们还忽略了一个参数: memory-swap, 当没有设置 memory-swap 时它的值会是 memory-limit 的两倍, 假如设置了 limit-memory=300M, 没有设置 memory-swap, 这意味着容器可以使用 300M 内存和 300M Swap. [https://docs.docker.com/config/containers/resource_constraints/#--memory-swap-details](https://docs.docker.com/config/containers/resource_constraints/#--memory-swap-details)
 
 值得注意的是 Swap 并不是无损的, 相反的, 它十分慢(使用磁盘代替内存), 我们应该禁用它。
 
@@ -88,27 +88,23 @@ services:
 无奈, 那就关闭主机的 swap 吧。
 
 总结 当容器达到内存限制时会发送的事情:
-- 容器被 Kill 并重启. 解决办法是限制程序使用的内存, 如 redis 配置 maxmemory，或者将 mysql 的配置降低。
+- 容器被 Kill 并重启：为了避免停机，解决办法是限制程序使用的内存, 如 redis 配置 maxmemory，或者将 mysql 的配置降低。
 - 如果开启了 swap 则还有 swap 的副作用: 过高的磁盘占用和无比慢的响应时间，解决办法是关闭主机的 swap。
 
 2023-11-06 更新：
 
-虽然我关闭了主机的 swap，但有时候容器再达到 99% 内存使用的时候，不会在继续增长内存使用量而 OOM，而是启用了 swap，导致磁盘读取 100%，程序陷入假死状态。
+虽然我关闭了主机的 swap，但有时候容器再达到 90%+ 内存使用的时候，不会在继续增长内存使用量而 OOM，而是启用了 swap，导致磁盘读取 100%，程序陷入假死状态，看样子还是在使用 Swap。
 
-再次 google：`docker swap` 得到官方文档：https://docs.docker.com/config/containers/resource_constraints/
-
-Many of these features require your kernel to support Linux capabilities. To check for support, you can use the docker info command. If a capability is disabled in your kernel, you may see a warning at the end of the output like the following:
-
-```
-WARNING: No swap limit support
-```
-
-原来 swap limit 还需要配置才能支持？试试吧。
-
-再按照[文档](https://docs.docker.com/engine/install/troubleshoot/#kernel-cgroup-swap-limit-capabilities)指示操作下。
-
-再继续观察一段时间，哦 对了，memory-swap 不支持在 stack 模式下设置的问题在三年后（写文到现在）依然没人解决，有 [MR](https://github.com/moby/moby/pull/37872) 都不合。
+对了，我又看了一眼，memory-swap 不支持在 service 模式下设置的问题在三年后（写文到现在）依然没人解决，有 [MR](https://github.com/moby/moby/pull/37872) 都不合。
 
 2024-03-07 更新：
 
-实验证明关闭主机的 swap 不能控制 docker 使不使用 swap。
+经过实验确认证明了关闭主机的 swap 不能控制 docker 使不使用 swap，必须使用 docker 自己的 mem-limit 来控制是否来使用 swap。
+
+并且不一定是容器自身占用内存接近限制时才会使用 swap，有时候是主机内存被其他程序占用不足时，容器也会使用 swap。
+
+然而 docker service 不支持设置 memory-swap，有一些解决方法缓解使用 swap 的问题：
+- 使用 docker run 来启动容器，这样可以设置 memory-swap。
+- 别用 docker service 了，使用 k8s。
+- 严格控制程序自己的内存占用，比如在 go 中，可以通过设置环境变量 `GOMEMLIMIT: "200MiB"` 来限制内存使用，然后将 docker 的 memory-limit 设置得稍微大一点。
+- 花钱扩展主机内存。
