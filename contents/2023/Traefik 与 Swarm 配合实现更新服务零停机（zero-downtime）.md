@@ -7,8 +7,8 @@ draft: false
 desc: 
 ---
 
-> Version: traefik:v2.9
->
+> Last updated at: 2024-05-31
+> Traefik version: traefik:v3.0
 
 ## 启用 Swarm
 
@@ -40,14 +40,12 @@ networks:
 
 services:
   reverse-proxy:
-    # The official v2 Traefik docker image
-    image: traefik:v2.9
+    image: traefik:v3.0
     # Enables the web UI and tells Traefik to listen to docker
     command: |
       --api.insecure=true
-      --providers.docker
-      --providers.docker.swarmMode=true
-      --providers.docker.network=traefix
+      --providers.swarm
+      --providers.swarm.endpoint=unix:///var/run/docker.sock
       --entrypoints.web.address=:80
       --entrypoints.websecure.address=:443
       --certificatesresolvers.myresolver.acme.email=xxx@qq.com
@@ -178,18 +176,18 @@ traefik 不应该直接与 container 通讯，而是先链接到 overlay 定义�
 
 要启用这个网络链路，我们需要做两个改动：
 
-1. 启用 traefik swarm 模式。！！注意这是 v2 的写法，我在老的 [文档](https://www.traefik.tech/providers/docker/#swarmmode) 上找到了这样的写法。但新的 v3 使用的的另一个语法：https://doc.traefik.io/traefik/v3.0/providers/swarm/，我还没尝试过，不多说了。
+1. 启用 traefik swarm 模式。参看：https://doc.traefik.io/traefik/v3.0/providers/swarm/
 
 ```yaml
 services:
   reverse-proxy:
-    image: traefik:v2.9
+    image: traefik:v3.0
     command: |
-      --providers.docker
-      --providers.docker.swarmMode=true
+      --providers.swarm
+      --providers.swarm.endpoint=unix:///var/run/docker.sock
 ```
 
-1. 将服务的 labels 声明移动到 deploy 上：https://doc.traefik.io/traefik/v3.0/providers/docker/#routing-configuration-with-labels
+2. 将服务的 labels 声明移动到 deploy 上：https://doc.traefik.io/traefik/v3.0/providers/docker/#routing-configuration-with-labels
 
 ```yaml
 services:
@@ -201,4 +199,25 @@ services:
 
 ```
 
-重启服务，下班。
+3. 添加 `traefik.docker.lbswarm=true` label
+
+> 这个属性被我不小心漏掉了（在文档最下面），文档中说明了如果设置为 ture，Traefik 将使用 docker swarm 提供的虚拟 IP，而不是容器 IP。这意味着 Traefik 不会执行任何类型的负载平衡，而是将此任务委托给 swarm。
+
+```
+services:
+  weave:
+   deploy:
+      labels:
+        - "traefik.http.routers.weave.rule=(HOST(`huglight.cn`)) && (PathPrefix(`/api`) || PathPrefix(`/static`))"
+        - "traefik.http.services.weave.loadbalancer.server.port=8432"
+        - "traefik.docker.lbswarm=true"
+```
+
+重新部署服务。
+
+4. 检查
+启用了 Swarm 之后容器将会被分配一个虚拟 IP，Swarm 内部会将这个 IP 负载到多个 Pod 副本上。
+
+通过 `docker service inspect -f '{{json .Endpoint.VirtualIPs}}' service_name` 来查看这个服务的虚拟 ip。
+
+然后在 Traefik Dashboard 上查看你的服务的 url 是否是上述的 ip 地址。
